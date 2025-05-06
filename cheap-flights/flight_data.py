@@ -6,7 +6,6 @@ class FlightData:
         self.origin_airport = origin_airport
         self.destination_airport = destination_airport
         self.out_date = out_date
-        #self.return_date = return_date
 
     @staticmethod
     def find_cheapest_flight(flights_data):
@@ -25,14 +24,11 @@ class FlightData:
         origin = firts_flight["itineraries"][0]["segments"][0]["departure"]["iataCode"]
         destination = firts_flight["itineraries"][0]["segments"][0]["arrival"]["iataCode"]
         out_date = firts_flight["itineraries"][0]["segments"][0]["departure"]["at"].split("T")[0]
-        #return_date = ["itineraries"][1]["segments"][0]["departure"]["at"].split("T")[0]
         cheapest_flight = FlightData(
             price=lowest_price, 
             origin_airport=origin, 
             destination_airport=destination, 
-            out_date=out_date
-            #return_date=return_date
-        )
+            out_date=out_date        )
         # find the lowest price
         if flights_data != []:
             for flight in flights_data["data"]:
@@ -44,7 +40,6 @@ class FlightData:
                         origin_airport=flight["itineraries"][0]["segments"][0]["departure"]["iataCode"],
                         destination_airport=flight["itineraries"][0]["segments"][0]["arrival"]["iataCode"],
                         out_date=flight["itineraries"][0]["segments"][0]["departure"]["at"].split("T")[0]
-                        #return_date=flight["itineraries"][1]["segments"][0]["departure"]["at"].split("T")[0]
                     )
                     print(f"cheapest flight to {destination} is {lowest_price}$")
         return cheapest_flight

@@ -22,19 +22,21 @@ if sheet_data[0]["iataCode"] == '':
 
 # define flight time
 tomorrow = datetime.now() + timedelta(days=1)
-six_month_from_today = datetime.now() + timedelta(days=(6 * 30))
+two_months_from_now = tomorrow + timedelta(days=(2 * 30))
+print(f"DEBUG: {tomorrow}, {two_months_from_now}")
 
 # get flight offers
 for row in sheet_data:
     # get all flights offers
-    all_flights_for_row = flight_search.get_flight_offers(
+    all_flights = flight_search.get_flight_offers(
         origin_city_code=ORIGIN_CITY_IATA, 
         destination_city_code=row["iataCode"],
-        from_time=tomorrow
-        #to_time=six_month_from_today
+        tomorrow=tomorrow.strftime("%Y-%m-%d"),
+        two_months_from_now=two_months_from_now.strftime("%Y-%m-%d")
     )
+    print(f"DEBUG:\n -------------\n {all_flights} ")
     # finds cheapest one
-    cheapest_flight = FlightData.find_cheapest_flight(all_flights_for_row) # FlightData object
+    cheapest_flight = FlightData.find_cheapest_flight(all_flights) # FlightData object
     print(f"{row["city"]} result: {cheapest_flight.price}$")
 
 

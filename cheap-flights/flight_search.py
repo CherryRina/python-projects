@@ -1,6 +1,7 @@
 import os
-import requests
 import json
+import requests
+from datetime import timedelta, datetime
 from pprint import pprint
 from dotenv import load_dotenv
 
@@ -52,27 +53,30 @@ class FlightSearch:
         code = response.json()["data"][0]['iataCode']
         return code
     
-    def get_flight_offers(self, origin_city_code, destination_city_code, from_time):
+    def get_flight_offers(self, origin_city_code, destination_city_code, tomorrow, two_months_from_now):
         """ method finds all flight offers """
         headers = {"Authorization": f"Bearer {self._token}"}
-        query = {
-            "originLocationCode": origin_city_code,
-            "destinationLocationCode": destination_city_code,
-            "departureDate": from_time.strftime("%Y-%m-%d"),
-            #"returnDate": to_time.strftime("%Y-%m-%d"),
-            "adults": 1,
-            "nonStop": "true",
-            "max": "200"
-        }
-        response = requests.get(
-            url=AMADEUS_FLIGHT_OFFERS_ENDPOINT, 
-            headers=headers, 
-            params=query
-            )
-        all_fliights = response.json()
+        new_dict = {}
+        current_date = datetime.strftime(tomorrow, "%Y-%m-%d")
+        two_months_from_now = datetime.strftime(two_months_from_now, "%Y-%m-%d")
+        while current_date <= two_months_from_now:
 
-        with open(f'{destination_city_code}-flights.json', 'w') as file:
-            json.dump(all_fliights, file, indent=4)
-            print("json file created")
-
-        return all_fliights
+            query = {
+                "originLocationCode": origin_city_code,
+                "destinationLocationCode": destination_city_code,
+                "departureDate": current_date,
+                "adults": 1,
+                "nonStop": "true",
+                "max": "2"
+            }
+            response = requests.get(
+                url=AMADEUS_FLIGHT_OFFERS_ENDPOINT, 
+                headers=headers, 
+                params=query
+                )
+            # creates new dict with the eapest flights for the next week
+            with open('json.json', 'w') as file:
+                json.dump(response.json(), file, indent=4)
+            new_dict[current_date]=response.json()["data"][0]["price"]["grandTotal"]
+            current_date += timedelta(days=1)
+        return new_dict
